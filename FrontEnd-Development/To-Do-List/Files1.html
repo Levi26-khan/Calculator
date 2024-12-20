@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo App with Reminder</title>
+    <link rel="stylesheet" href="Css1.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="main-heading">TODO APP</h1>
+        <div class="input-container">
+            <input id="todo-input" type="text" placeholder="Enter Todo here">
+            <input id="todo-date" type="datetime-local">
+            <input id="todo-duration" type="number" placeholder="Duration in minutes">
+            <button id="add-btn" onclick="addTodo()">Add</button>
+        </div>
+        <ul id="todo-items"></ul>
+    </div>
+    <script src="Todo.js"></script>
+</body>
+</html>
