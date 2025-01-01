@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Game</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #28a745;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas {
+            border: 3px solid #fff;
+            background-color: #006400;
+        }
+
+        #scoreboard {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="scoreboard">Player 1: 0 | Player 2: 0</div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ball properties
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            dx: 4,
+            dy: 4
+        };
+
+        // Paddle properties
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const paddle1 = { x: 0, y: canvas.height / 2 - paddleHeight / 2, score: 0 };
+        const paddle2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, score: 0 };
+
+        // Key states
+        const keys = {};
+
+        // Draw ball
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Draw paddles
+        function drawPaddle(paddle) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(paddle.x, paddle.y, paddleWidth, paddleHeight);
+        }
+
+        // Draw scoreboard
+        function drawScore() {
+            const scoreboard = document.getElementById('scoreboard');
+            scoreboard.textContent = `Player 1: ${paddle1.score} | Player 2: ${paddle2.score}`;
+        }
+
+        // Move paddles
+        function movePaddles() {
+            if (keys['w'] && paddle1.y > 0) paddle1.y -= 5;
+            if (keys['s'] && paddle1.y < canvas.height - paddleHeight) paddle1.y += 5;
+
+            if (keys['ArrowUp'] && paddle2.y > 0) paddle2.y -= 5;
+            if (keys['ArrowDown'] && paddle2.y < canvas.height - paddleHeight) paddle2.y += 5;
+        }
+
+        // Update ball position
+        function updateBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Bounce off top and bottom walls
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                ball.dy *= -1;
+            }
+
+            // Bounce off paddles
+            if (
+                ball.x - ball.radius < paddle1.x + paddleWidth &&
+                ball.y > paddle1.y &&
+                ball.y < paddle1.y + paddleHeight
+            ) {
+                ball.dx *= -1;
+            }
+
+            if (
+                ball.x + ball.radius > paddle2.x &&
+                ball.y > paddle2.y &&
+                ball.y < paddle2.y + paddleHeight
+            ) {
+                ball.dx *= -1;
+            }
+
+            // Check for scoring
+            if (ball.x - ball.radius < 0) {
+                paddle2.score += 1;
+                resetBall();
+            }
+
+            if (ball.x + ball.radius > canvas.width) {
+                paddle1.score += 1;
+                resetBall();
+            }
+        }
+
+        // Reset ball position
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = -ball.dx;
+            ball.dy = 4;
+        }
+
+        // Game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawBall();
+            drawPaddle(paddle1);
+            drawPaddle(paddle2);
+            drawScore();
+
+            movePaddles();
+            updateBall();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event listeners for key presses
+        window.addEventListener('keydown', (e) => keys[e.key] = true);
+        window.addEventListener('keyup', (e) => keys[e.key] = false);
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
